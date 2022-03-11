@@ -26,7 +26,7 @@
  '(ns-command-modifier 'meta)
  '(org-hide-emphasis-markers t)
  '(package-selected-packages
-   '(dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -65,11 +65,6 @@
 (global-set-key "\C-c\C-r" 'reload-dotemacs)
 (global-set-key "\C-c\C-i" (lambda() (interactive)(find-file "~/org/index.org")))
 
-
-;;(load-theme 'vs-light t)
-;;(load-theme 'zenburn t)
-;;(load-theme 'doom-one t)
-
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -80,14 +75,9 @@
    '(define-key artist-mode-map [(down-mouse-3)] 'artist-mouse-choose-operation)
    )
 
-;; Company mode
-(setq company-idle-delay 0)
-(setq company-minimum-prefix-length 1)
-
 ;; Initialize package sources
 (require 'package)
 
-;;(add-to-list 'package-archives '("elpa" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
@@ -115,7 +105,6 @@
 	     :config
 	     (load-theme 'doom-one t)
 )
-
 
 (use-package projectile
   :ensure t
@@ -165,21 +154,35 @@
        :hook ((prog-mode . hl-todo-mode)
               (yaml-mode . hl-todo-mode)))
 
+(use-package company
+  :ensure t
+  :config
+  ;; Company mode
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 1)
+  )
+
 ;; set up lsp support
 (use-package lsp-mode
   :hook (web-mode . lsp)
   :commands lsp)
 
-;; Go - lsp-mode
-;; Set up before-save hooks to format buffer and add/delete imports.
-(defun lsp-go-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+(use-package yasnippet-snippets
+  :ensure t)
 
-;; Start LSP Mode and YASnippet mode
-(add-hook 'go-mode-hook #'lsp-deferred)
-(add-hook 'go-mode-hook #'yas-minor-mode)
+(use-package go-mode
+  :ensure t
+  :config
+  ;; Go - lsp-mode
+  ;; Set up before-save hooks to format buffer and add/delete imports.
+  (defun lsp-go-install-save-hooks ()
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+  ;; Start LSP Mode and YASnippet mode
+  (add-hook 'go-mode-hook #'lsp-deferred)
+  (add-hook 'go-mode-hook #'yas-minor-mode))
 
 (use-package web-mode
   :mode "\\.vue\\'"
