@@ -1,5 +1,3 @@
-(setq inhibit-startup-message t)
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -18,6 +16,7 @@
  '(exec-path
    '("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_14" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_14" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin" "/Users/jochem/go/bin" "/usr/local/bin"))
  '(fringe-mode '(0 . 5) nil (fringe))
+ '(inhibit-startup-screen t)
  '(ivy-display-style 'fancy)
  '(kept-new-versions 6)
  '(line-number-mode nil)
@@ -45,7 +44,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:height 160 :width normal :family "SF Mono"))))
+ '(default ((t (:height 180 :width normal :family "SF Mono"))))
  '(hl-todo ((t (:inherit hl-todo :italic t)))))
 
 (setq
@@ -63,6 +62,9 @@
 (global-set-key (kbd "C-w") 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
 (global-set-key "\C-c\C-k" 'kill-region)
+(global-set-key "\C-c\C-r" 'reload-dotemacs)
+(global-set-key "\C-c\C-i" (lambda() (interactive)(find-file "~/org/index.org")))
+
 
 ;;(load-theme 'vs-light t)
 ;;(load-theme 'zenburn t)
@@ -74,23 +76,26 @@
 ;; visually wrap long lines in markdown-mode
 (add-hook 'markdown-mode-hook #'visual-line-mode)
 
+(eval-after-load "artist"
+   '(define-key artist-mode-map [(down-mouse-3)] 'artist-mouse-choose-operation)
+   )
+
+;; Company mode
+(setq company-idle-delay 0)
+(setq company-minimum-prefix-length 1)
+
 ;; Initialize package sources
 (require 'package)
 
-;;(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-;;                         ("org" . "https://orgmode.org/elpa/")
-;;                         ("elpa" . "https://elpa.gnu.org/packages/")))
-
+(add-to-list 'package-archives '("elpa" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-
 
 ;; https://emacs.stackexchange.com/questions/68288/error-retrieving-https-elpa-gnu-org-packages-archive-contents
 ;; Error retrieving: https://elpa.gnu.org/packages/archive-contents
 ;;(when (and (equal emacs-version "27.2")
 ;;           (eql system-type 'darwin))
 ;;  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-
 
 (package-initialize)
 (unless package-archive-contents
@@ -104,15 +109,6 @@
 (setq use-package-always-ensure t)
 
 (use-package command-log-mode)
-
-(eval-after-load "artist"
-   '(define-key artist-mode-map [(down-mouse-3)] 'artist-mouse-choose-operation)
-   )
-
-;; Company mode
-(setq company-idle-delay 0)
-(setq company-minimum-prefix-length 1)
-
 
 (use-package projectile
   :ensure t
@@ -172,17 +168,12 @@
 (add-hook 'go-mode-hook #'lsp-deferred)
 (add-hook 'go-mode-hook #'yas-minor-mode)
 
-;; for completions
-;(use-package company-lsp
-;  :after lsp-mode
-;  :config (push 'company-lsp company-backends))
-
-
 (use-package web-mode
   :mode "\\.vue\\'"
   :config
   (add-hook 'web-mode-hook #'lsp))
 
+;; icons for dired-sidebar
 (use-package vscode-icon
   :ensure t
   :commands (vscode-icon-for-file))
@@ -240,9 +231,10 @@
 ;;
 ;; # -*- buffer-auto-save-file-name: nil; -*-
 
-(font-lock-add-keywords 'org-mode
-                        '(("^ *\\([-]\\) "
-                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+(font-lock-add-keywords
+ 'org-mode
+ '(("^ *\\([-]\\) "
+    (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
 (defun reload-dotemacs ()
   "reload your .emacs file without restarting Emacs"
