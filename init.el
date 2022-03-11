@@ -26,7 +26,7 @@
  '(ns-command-modifier 'meta)
  '(org-hide-emphasis-markers t)
  '(package-selected-packages
-   '(company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -68,7 +68,7 @@
 
 ;;(load-theme 'vs-light t)
 ;;(load-theme 'zenburn t)
-(load-theme 'doom-one t)
+;;(load-theme 'doom-one t)
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -87,15 +87,15 @@
 ;; Initialize package sources
 (require 'package)
 
-(add-to-list 'package-archives '("elpa" . "https://elpa.gnu.org/packages/") t)
+;;(add-to-list 'package-archives '("elpa" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 
 ;; https://emacs.stackexchange.com/questions/68288/error-retrieving-https-elpa-gnu-org-packages-archive-contents
 ;; Error retrieving: https://elpa.gnu.org/packages/archive-contents
-;;(when (and (equal emacs-version "27.2")
-;;           (eql system-type 'darwin))
-;;  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+(when (and (equal emacs-version "27.2")
+          (eql system-type 'darwin))
+ (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 
 (package-initialize)
 (unless package-archive-contents
@@ -110,11 +110,24 @@
 
 (use-package command-log-mode)
 
+(use-package doom-themes
+	     :ensure t
+	     :config
+	     (load-theme 'doom-one t)
+)
+
+
 (use-package projectile
   :ensure t
   :config
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)  
   (projectile-mode +1))
+
+(use-package magit
+  :ensure t)
+
+(use-package swiper
+  :ensure t)
 
 (use-package ivy
   :diminish
