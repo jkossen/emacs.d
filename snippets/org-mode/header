@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: org-header
+# key: h
+# --
+#+TITLE: ${1:TITLE} 
+#+AUTHOR: Jochem Kossen
+#+DATE: `(format-time-string "<%Y-%m-%d>")`
+
