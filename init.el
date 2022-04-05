@@ -3,6 +3,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(auto-dark--dark-theme 'modus-vivendi)
+ '(auto-dark--light-theme 'modus-operandi)
  '(auto-save-file-name-transforms '((".*" "~/.saves" t)))
  '(backup-by-copying t)
  '(backup-directory-alist '(("." . "~/.saves/")))
@@ -27,7 +29,7 @@
  '(ns-command-modifier 'meta)
  '(org-hide-emphasis-markers t)
  '(package-selected-packages
-   '(twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -127,11 +129,10 @@
 ;; 	     (load-theme 'doom-one t)
 ;; )
 
-(use-package modus-themes
-  :ensure t
-  :config
-  (load-theme 'modus-vivendi t)
-  )
+(use-package modus-themes)
+
+(use-package auto-dark
+  :ensure t)
 
 (use-package projectile
   :ensure t
