@@ -29,7 +29,7 @@
  '(ns-command-modifier 'meta)
  '(org-hide-emphasis-markers t)
  '(package-selected-packages
-   '(auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -50,8 +50,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:height 180 :width normal :family "SF Mono"))))
- '(hl-todo ((t (:inherit hl-todo :italic t)))))
+ )
 
 (setq
  default-directory "~/"
@@ -82,8 +81,9 @@
 (global-set-key (kbd "C-<left>") 'backward-word)
 (global-set-key (kbd "C-<right>") 'forward-word)
 (global-set-key (kbd "C-d") 'duplicate-line)
+(global-set-key "\C-c\ c" 'org-capture)
 (global-set-key "\C-c\ l" 'org-store-link)
-(global-set-key "\C-c\C-i" (lambda() (interactive)(find-file "~/org/index.org")))
+(global-set-key "\C-c\ h" (lambda() (interactive)(find-file "~/org/index.org")))
 (global-set-key (kbd "<C-tab>") 'yas-expand)
 
 ;; Make ESC quit prompts
@@ -101,8 +101,7 @@
 
 (with-eval-after-load 'package
   (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
-  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t))
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
 ;; https://emacs.stackexchange.com/questions/68288/error-retrieving-https-elpa-gnu-org-packages-archive-contents
 ;; Error retrieving: https://elpa.gnu.org/packages/archive-contents
@@ -122,12 +121,6 @@
 (setq use-package-always-ensure t)
 
 (use-package command-log-mode)
-
-;; (use-package doom-themes
-;; 	     :ensure t
-;; 	     :config
-;; 	     (load-theme 'doom-one t)
-;; )
 
 (use-package modus-themes)
 
@@ -186,10 +179,43 @@
   :ensure t
   :config
   ;; Company mode
+  (add-hook 'after-init-hook 'global-company-mode)
   (setq company-idle-delay 0)
   (setq company-minimum-prefix-length 1)
-  (add-hook 'after-init-hook 'global-company-mode)
-  )
+  ;;; Prevent suggestions from being triggered automatically. In particular,
+  ;;; this makes it so that:
+  ;;; - TAB will always complete the current selection.
+  ;;; - RET will only complete the current selection if the user has explicitly
+  ;;;   interacted with Company.
+  ;;; - SPC will never complete the current selection.
+  ;;;
+  ;;; Based on:
+  ;;; - https://github.com/company-mode/company-mode/issues/530#issuecomment-226566961
+  ;;; - https://emacs.stackexchange.com/a/13290/12534
+  ;;; - http://stackoverflow.com/a/22863701/3538165
+  ;;;
+  ;;; See also:
+  ;;; - https://emacs.stackexchange.com/a/24800/12534
+  ;;; - https://emacs.stackexchange.com/q/27459/12534
+
+  ;; <return> is for windowed Emacs; RET is for terminal Emacs
+  (dolist (key '("<return>" "RET"))
+    ;; Here we are using an advanced feature of define-key that lets
+    ;; us pass an "extended menu item" instead of an interactive
+    ;; function. Doing this allows RET to regain its usual
+    ;; functionality when the user has not explicitly interacted with
+    ;; Company.
+    (define-key company-active-map (kbd key)
+      `(menu-item nil company-complete
+                  :filter ,(lambda (cmd)
+                             (when (company-explicit-action-p)
+                               cmd)))))
+  (define-key company-active-map (kbd "TAB") #'company-complete-selection)
+  (define-key company-active-map (kbd "SPC") nil)
+
+  ;; Company appears to override the above keymap based on company-auto-complete-chars.
+  ;; Turning it off ensures we have full control.
+  (setq company-auto-complete-chars nil))
 
 ;; set up lsp support
 (use-package lsp-mode
@@ -308,13 +334,27 @@
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
   (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
+  (setq org-log-done 'time)
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+  (setq org-capture-templates
+	'(("t" "Todo" entry (file+headline "~/org/index.org" "Taken")
+           "* TODO %?\n" :prepend t)
+	  ("T" "Work Todo" entry (file+headline "~/work/org/index.org.gpg" "Taken") "* TODO %?\n" :prepend t)
+	  ("r" "Relevant Todo" entry (file+headline "~/org/index.org" "Taken")
+           "* TODO %?\n  %i\n  %a" :prepend t)
+          ("c" "Capture" entry (file+datetree "~/org/capture.org")
+           "* %?\nEntered on %U\n  %i\n  %a"
+	   "* TODO %?\n")
+          ("w" "Work note" entry (file+datetree "~/work/org/capture.org.gpg")
+           "* %?\nEntered on %U\n"))
+	))
 ;;
 ;; /some bits from Emacs From Scratch
 ;; /see https://github.com/daviwil/emacs-from-scratch/blob/master/init.el
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(add-hook 'org-mode-hook 'variable-pitch-mode)
+;;(add-hook 'org-mode-hook 'variable-pitch-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
 (add-hook 'org-mode-hook 'org-indent-mode)
 (add-hook 'org-mode-hook 'org-mode-setup)
@@ -353,36 +393,49 @@
 
 (setq org-publish-project-alist
       `(("pages"
+         :recursive t
          :base-directory "~/org/jkossen.nl"
          :base-extension "org"
-         :recursive t
+         :publishing-directory "~/jkossen.nl/public/"
+         :publishing-function org-html-publish-to-html
+
+	 :author "Jochem Kossen"
+	 :email "jochem@jkossen.nl"
+
+	 :auto-sitemap t            ;; create sitemap.org + .html
+	 :sitemap-sort-folders "first"
+;;	 :sitemap-sort-files anti-chronologically
+	 :with-author nil           ;; Don't include author name
+	 :with-creator t            ;; Include Emacs and Org versions in footer
+         :with-toc nil                ;; Include a table of contents
+         :section-numbers nil       ;; Don't include section numbers
+	 :time-stamp-file nil
+	 :with-author t
+	 :headline-levels 4
+	 
 	 :html-doctype "html5"
 	 :html-html5-fancy t
 	 :html-head-include-scripts nil
 	 :html-head-include-default-style nil
-	 :html-head "<link rel=\"stylesheet\" href=\"/style.css\" type=\"text/css\"/>" 
-         :publishing-directory "~/jkossen.nl/public/"
-         :publishing-function org-html-publish-to-html
-	:html-preamble "<nav>
-  <a href=\"/\">&lt; Home</a>
-</nav>
-<div id=\"updated\">Updated: %C</div>
-<main>
+	 :html-head "<link rel=\"stylesheet\" href=\"/style.css\" type=\"text/css\"/>"
+	 :html-preamble "
+    <header>
+      <h1><a href=\"https://jkossen.nl\">jkossen.nl</a></h1>
+    </header>
 "
- 
+
 	:html-postamble "
-</main>
 <hr/>
 <footer>
   <div class=\"copyright-container\">
     <div class=\"copyright\">
       Copyright &copy; 2016-2022 Jochem Kossen some rights reserved<br/>
     </div>
-    </div>
   </div>
 
   <div class=\"generated\">
     Created with %c
+    <div id=\"updated\">Updated: %C</div>
   </div>
 </footer>")
 
@@ -395,6 +448,10 @@
 
         ("jkossen.nl" :components ("pages" "static"))))
 
+(defun pubkos ()
+  "republish site, unmodified files included"
+  (interactive)
+  (org-publish "jkossen.nl" t))
 
 ;; (use-package org-roam
 ;;   :ensure t)
