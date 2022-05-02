@@ -3,8 +3,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(auto-dark--dark-theme 'modus-vivendi)
- '(auto-dark--light-theme 'modus-operandi)
  '(auto-save-file-name-transforms '((".*" "~/.saves" t)))
  '(backup-by-copying t)
  '(backup-directory-alist '(("." . "~/.saves/")))
@@ -16,7 +14,7 @@
  '(delete-old-versions t)
  '(dired-sidebar-theme 'vscode)
  '(exec-path
-   '("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_14" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_14" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin" "/Users/jochem/go/bin" "/usr/local/bin"))
+   '("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_14" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_14" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin" "/Users/jochem/go/bin" "/usr/local/bin" "/opt/bin"))
  '(fringe-mode '(0 . 5) nil (fringe))
  '(inhibit-startup-screen t)
  '(ivy-display-style 'fancy)
@@ -25,11 +23,14 @@
  '(line-number-mode nil)
  '(lsp-volar-take-over-mode t)
  '(mark-even-if-inactive nil)
+ '(mu4e-drafts-folder "/Drafts")
+ '(mu4e-sent-folder "/Sent")
+ '(mu4e-trash-folder "/Trash")
  '(ns-alternate-modifier 'super)
  '(ns-command-modifier 'meta)
  '(org-hide-emphasis-markers t)
  '(package-selected-packages
-   '(ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(ox-hugo mu4e-views ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -42,6 +43,7 @@
    '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120))
  '(tool-bar-mode nil)
  '(tooltip-mode nil)
+ '(user-mail-address "jochem@jkossen.nl")
  '(version-control t)
  '(visible-bell t))
 
@@ -50,7 +52,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(hl-todo ((t (:inherit hl-todo :italic t)))))
 
 (setq
  default-directory "~/"
@@ -61,7 +63,7 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(setenv "PATH" (concat (getenv "PATH") ":/Users/jochem/go/bin:/usr/local/bin"))
+(setenv "PATH" (concat (getenv "PATH") ":/Users/jochem/go/bin:/usr/local/bin:/opt/bin"))
 
 (defun duplicate-line()
   (interactive)
@@ -96,6 +98,8 @@
   '(define-key artist-mode-map [(down-mouse-3)] 'artist-mouse-choose-operation)
   )
 
+(add-to-list 'load-path "/opt/share/emacs/site-lisp/")
+
 ;; Initialize package sources
 (require 'package)
 
@@ -120,24 +124,44 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+;; -*- notmuch -*-
+;; use notmuch from OS packages not elpa, since commandline utils and
+;; elpa versions are not often the same
+(setq send-mail-function 'sendmail-send-it)
+(setq mail-host-address "jkossen.nl")
+(setq user-full-name "Jochem Kossen")
+(setq notmuch-archive-tags '("-inbox" "+archive"))
+(setq notmuch-fcc-dirs "Sent")
+(setq notmuch-search-oldest-first nil)
+(setq notmuch-saved-searches
+      '((:name "inbox" :query "tag:inbox" :key "i")
+	(:name "unread" :query "tag:unread" :key "u")
+	(:name "sent" :query "tag:sent" :key "s")
+	(:name "drafts" :query "tag:draft" :key "d")
+	(:name "all mail" :query "*" :key "a")
+	(:name "Inbox" :query "folder:Inbox" :key "I")
+	(:name "Gmail" :query "folder:gmail" :key "G")
+	(:name "Junk" :query "folder:Junk" :key "J")
+	(:name "Trash" :query "folder:Trash" :key "T")))
+(require 'notmuch)
+
 (use-package command-log-mode)
 
 (use-package modus-themes)
 
 (use-package auto-dark
-  :ensure t)
+  :config
+  (setq auto-dark--dark-theme 'modus-vivendi)
+  (setq auto-dark--light-theme 'modus-operandi))
 
 (use-package projectile
-  :ensure t
   :config
   (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (projectile-mode +1))
 
-(use-package magit
-  :ensure t)
+(use-package magit)
 
-(use-package swiper
-  :ensure t)
+(use-package swiper)
 
 (use-package ivy
   :diminish
@@ -158,7 +182,6 @@
   (ivy-mode 1))
 
 (use-package doom-modeline
-  :ensure t
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
@@ -169,14 +192,12 @@
 	))
 
 (use-package hl-todo
-  :ensure t
   :custom-face
   (hl-todo ((t (:inherit hl-todo :italic t))))
   :hook ((prog-mode . hl-todo-mode)
          (yaml-mode . hl-todo-mode)))
 
 (use-package company
-  :ensure t
   :config
   ;; Company mode
   (add-hook 'after-init-hook 'global-company-mode)
@@ -225,11 +246,9 @@
   (setq lsp-eldoc-render-all t)
   )
 
-(use-package yasnippet-snippets
-  :ensure t)
+(use-package yasnippet-snippets)
 
 (use-package go-mode
-  :ensure t
   :config
   ;; Go - lsp-mode
   ;; Set up before-save hooks to format buffer and add/delete imports.
@@ -255,12 +274,10 @@
 
 ;; icons for dired-sidebar
 (use-package vscode-icon
-  :ensure t
   :commands (vscode-icon-for-file))
 
 (use-package dired-sidebar
   :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
-  :ensure t
   :commands (dired-sidebar-toggle-sidebar)
   :init
   (add-hook 'dired-sidebar-mode-hook
@@ -303,13 +320,13 @@
 ;; some bits from Emacs From Scratch
 ;; see https://github.com/daviwil/emacs-from-scratch/blob/master/init.el
 ;;
-(set-face-attribute 'default nil :font "SF Mono" :height 180)
+(set-face-attribute 'default nil :font "FiraCode" :height 140)
 
 ;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "SF Mono" :height 180)
+(set-face-attribute 'fixed-pitch nil :font "FiraCode" :height 140)
 
 ;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 180 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)
 
 (defun org-mode-setup ()
   ;; Set faces for heading levels
@@ -391,6 +408,7 @@
 
 (require 'ox-publish)
 
+;; https://vincent.demeester.fr/posts/2020-03-22-org-mode-website.html
 (setq org-publish-project-alist
       `(("pages"
          :recursive t
@@ -404,7 +422,10 @@
 
 	 :auto-sitemap t            ;; create sitemap.org + .html
 	 :sitemap-sort-folders "first"
-;;	 :sitemap-sort-files anti-chronologically
+	 :sitemap-sort-files anti-chronologically
+;;	 :sitemap-format-entry my/org-sitemap-date-entry-format
+	 :sitemap-format-entry sbr/org-sitemap-format-entry
+	 :sitemap-style list
 	 :with-author nil           ;; Don't include author name
 	 :with-creator t            ;; Include Emacs and Org versions in footer
          :with-toc nil                ;; Include a table of contents
@@ -448,13 +469,56 @@
 
         ("jkossen.nl" :components ("pages" "static"))))
 
+(setq org-html-divs '((preamble "header" "top")
+                      (content "main" "content")
+                      (postamble "footer" "postamble"))
+      org-html-container-element "section")
+      
 (defun pubkos ()
   "republish site, unmodified files included"
   (interactive)
   (org-publish "jkossen.nl" t))
 
-;; (use-package org-roam
-;;   :ensure t)
+(defun sbr/org-sitemap-format-entry (entry style project)
+  "Format posts with author and published data in the index page.
+
+ENTRY: file-name
+STYLE:
+PROJECT: `posts in this case."
+  (cond ((not (directory-name-p entry))
+         (format "%s — [[file:%s][%s]]
+                 :PROPERTIES:
+                 :PUBDATE: [%s]
+                 :END:"
+                 (format-time-string "%Y-%m-%d"
+                                     (org-publish-find-date entry project))
+                 entry
+                 (org-publish-find-title entry project)
+                 (format-time-string "%Y-%m-%d"
+                                     (org-publish-find-date entry project))))
+        ((eq style 'tree) (file-name-nondirectory (directory-file-name entry)))
+        (t entry)))
+
+(defun sbr/org-publish-sitemap (title list)
+  ""
+  (concat "#+TITLE: " title "\n\n"
+          (org-list-to-subtree list)))
+
+(defun my/org-sitemap-date-entry-format (entry style project)
+  "Format ENTRY in org-publish PROJECT Sitemap format ENTRY ENTRY STYLE format that includes date."
+  (let ((filename (org-publish-find-title entry project)))
+    (if (= (length filename) 0)
+        (format "*%s*" entry)
+      (format "{{{timestamp(%s)}}} [[file:%s][%s]]"
+              (format-time-string "%Y-%m-%d"
+                                  (org-publish-find-date entry project))
+              entry
+              filename))))
+
+(setq org-export-global-macros
+      '(("timestamp" . "@@html:<span class=\"timestamp\">[$1]</span>@@")))
+
+;; (use-package org-roam)
 
 ;; (org-roam-db-autosync-mode)
 
