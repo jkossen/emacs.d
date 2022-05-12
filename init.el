@@ -101,6 +101,7 @@
   )
 
 (add-to-list 'load-path "/opt/share/emacs/site-lisp/")
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/notmuch")
 
 ;; Initialize package sources
 (require 'package)
@@ -327,13 +328,18 @@
 ;; some bits from Emacs From Scratch
 ;; see https://github.com/daviwil/emacs-from-scratch/blob/master/init.el
 ;;
-(set-face-attribute 'default nil :font "FiraCode" :height 140)
 
-;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "FiraCode" :height 140)
-
-;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)
+;; set different fonts for MacOS and retina screen
+(if (eql system-type 'darwin)
+    (progn 
+      (set-face-attribute 'default nil :font "SF Mono" :height 180)
+      (set-face-attribute 'fixed-pitch nil :font "SF Mono" :height 180)
+      (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 180 :weight 'regular))
+  
+  (progn
+    (set-face-attribute 'default nil :font "FiraCode" :height 140)
+    (set-face-attribute 'fixed-pitch nil :font "FiraCode" :height 140)
+    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)))
 
 (defun org-mode-setup ()
   ;; Set faces for heading levels
