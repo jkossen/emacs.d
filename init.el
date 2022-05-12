@@ -16,6 +16,7 @@
  '(exec-path
    '("/usr/bin" "/bin" "/usr/sbin" "/sbin" "/Applications/Emacs.app/Contents/MacOS/bin-x86_64-10_14" "/Applications/Emacs.app/Contents/MacOS/libexec-x86_64-10_14" "/Applications/Emacs.app/Contents/MacOS/libexec" "/Applications/Emacs.app/Contents/MacOS/bin" "/Users/jochem/go/bin" "/usr/local/bin" "/opt/bin"))
  '(fringe-mode '(0 . 5) nil (fringe))
+ '(indent-tabs-mode nil)
  '(inhibit-startup-screen t)
  '(ivy-display-style 'fancy)
  '(kept-new-versions 16)
@@ -37,10 +38,11 @@
  '(right-margin 2)
  '(safe-local-variable-values
    '((eval setq-local org-roam-directory
-	   (expand-file-name "./"))))
+           (expand-file-name "./"))))
  '(scroll-bar-mode nil)
  '(tab-stop-list
    '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120))
+ '(tab-width 4)
  '(tool-bar-mode nil)
  '(tooltip-mode nil)
  '(user-mail-address "jochem@jkossen.nl")
@@ -238,6 +240,11 @@
   ;; Turning it off ensures we have full control.
   (setq company-auto-complete-chars nil))
 
+;; move point from window to window using Shift and the arrow keys.
+;; https://www.emacswiki.org/emacs/WindMove
+(when (fboundp 'windmove-default-keybindings)
+  (windmove-default-keybindings))
+
 ;; set up lsp support
 (use-package lsp-mode
   :hook (web-mode . lsp)
@@ -421,6 +428,7 @@
 	 :email "jochem@jkossen.nl"
 
 	 :auto-sitemap t            ;; create sitemap.org + .html
+	 :sitemap-style list
 	 :sitemap-sort-folders "first"
 	 :sitemap-sort-files anti-chronologically
 ;;	 :sitemap-format-entry my/org-sitemap-date-entry-format
@@ -435,6 +443,7 @@
 	 :headline-levels 4
 	 
 	 :html-doctype "html5"
+
 	 :html-html5-fancy t
 	 :html-head-include-scripts nil
 	 :html-head-include-default-style nil
