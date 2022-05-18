@@ -29,7 +29,11 @@
  '(mu4e-trash-folder "/Trash")
  '(ns-alternate-modifier 'super)
  '(ns-command-modifier 'meta)
+ '(org-agenda-files '("~/work/org/index.org.gpg"))
  '(org-hide-emphasis-markers t)
+ '(org-hide-leading-stars t)
+ '(org-todo-keywords
+   '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
  '(package-selected-packages
    '(ox-hugo mu4e-views ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
@@ -88,6 +92,7 @@
 (global-set-key "\C-c\ c" 'org-capture)
 (global-set-key "\C-c\ l" 'org-store-link)
 (global-set-key "\C-c\ h" (lambda() (interactive)(find-file "~/org/index.org")))
+(global-set-key "\C-c\ w" (lambda() (interactive)(find-file "~/work/org/index.org.gpg")))
 (global-set-key (kbd "<C-tab>") 'yas-expand)
 
 ;; Make ESC quit prompts
@@ -241,10 +246,12 @@
   ;; Turning it off ensures we have full control.
   (setq company-auto-complete-chars nil))
 
+
 ;; move point from window to window using Shift and the arrow keys.
 ;; https://www.emacswiki.org/emacs/WindMove
-(when (fboundp 'windmove-default-keybindings)
-  (windmove-default-keybindings))
+;; NOTE: 2022-05-18: disabled, conflicts with editing timestamps
+;;(when (fboundp 'windmove-default-keybindings)
+;;  (windmove-default-keybindings))
 
 ;; set up lsp support
 (use-package lsp-mode
@@ -330,49 +337,60 @@
 ;;
 
 ;; set different fonts for MacOS and retina screen
+(set-face-attribute 'bold nil :weight 'semibold)
 (if (eql system-type 'darwin)
     (progn 
-      (set-face-attribute 'default nil :font "SF Mono" :height 180)
-      (set-face-attribute 'fixed-pitch nil :font "SF Mono" :height 180)
+      (set-face-attribute 'default nil :font "SF Mono" :height 180 :weight 'regular)
+      (set-face-attribute 'fixed-pitch nil :font "SF Mono" :height 180 :weight 'regular)
       (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 180 :weight 'regular))
   
   (progn
-    (set-face-attribute 'default nil :font "FiraCode" :height 140)
+    (set-face-attribute 'default nil :font "FiraCode" :height 140 :weight 'regular)
     (set-face-attribute 'fixed-pitch nil :font "FiraCode" :height 140)
     (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)))
 
 (defun org-mode-setup ()
   ;; Set faces for heading levels
-  (dolist (face '((org-level-1 . 1.2)
-                  (org-level-2 . 1.1)
-                  (org-level-3 . 1.05)
+  ;; (dolist (face '((org-level-1 . 1.2)
+  ;;                 (org-level-2 . 1.1)
+  ;;                 (org-level-3 . 1.05)
+  ;;                 (org-level-4 . 1.0)
+  ;;                 (org-level-5 . 1.1)
+  ;;                 (org-level-6 . 1.1)
+  ;;                 (org-level-7 . 1.1)
+  ;;                 (org-level-8 . 1.1)))
+  ;;   (set-face-attribute (car face) nil :inherit 'fixed-pitch :weight 'regular :height (cdr face)))
+  ;;   (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
+  
+  (dolist (face '((org-level-1 . 1.0)
+                  (org-level-2 . 1.0)
+                  (org-level-3 . 1.0)
                   (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
+                  (org-level-5 . 1.0)
+                  (org-level-6 . 1.0)
+                  (org-level-7 . 1.0)
+                  (org-level-8 . 1.0)))
     (set-face-attribute (car face) nil :inherit 'fixed-pitch :weight 'regular :height (cdr face)))
-;;    (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  ;; (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+  ;; (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
   (setq org-log-done 'time)
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (setq org-capture-templates
-	'(("t" "Todo" entry (file+headline "~/org/index.org" "Taken")
+	'(("t" "Todo" entry (file+headline "~/org/index.org" "Todo")
            "* TODO %?\n" :prepend t)
-	  ("T" "Work Todo" entry (file+headline "~/work/org/index.org.gpg" "Taken") "* TODO %?\n" :prepend t)
-	  ("r" "Relevant Todo" entry (file+headline "~/org/index.org" "Taken")
+	  ("T" "Work Todo" entry (file+headline "~/work/org/index.org.gpg" "Todo") "* TODO %?\n" :prepend t)
+	  ("r" "Relevant Todo" entry (file+headline "~/org/index.org" "Todo")
            "* TODO %?\n  %i\n  %a" :prepend t)
           ("c" "Capture" entry (file+datetree "~/org/capture.org")
            "* %?\nEntered on %U\n  %i\n  %a"
@@ -391,6 +409,14 @@
 (add-hook 'org-mode-hook 'org-mode-setup)
 (add-hook 'org-mode-hook 'yas-minor-mode)
 
+;; Make windmove work in Org mode:
+;; https://orgmode.org/manual/Conflicts.html
+;;(add-hook 'org-shiftup-final-hook 'windmove-up)
+;;(add-hook 'org-shiftleft-final-hook 'windmove-left)
+;;(add-hook 'org-shiftdown-final-hook 'windmove-down)
+;;(add-hook 'org-shiftright-final-hook 'windmove-right)
+
+(setq org-support-shift-select 'always)
 
 (use-package org-bullets
   :config
