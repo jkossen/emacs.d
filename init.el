@@ -29,13 +29,15 @@
  '(mu4e-trash-folder "/Trash")
  '(ns-alternate-modifier 'super)
  '(ns-command-modifier 'meta)
- '(org-agenda-files '("~/work/org/index.org.gpg"))
+ '(org-agenda-files
+   '("/Users/jochem/work/org/index.org.gpg" "~/work/org/bwijnolts.org.gpg"))
+ '(org-download-image-dir "./img")
  '(org-hide-emphasis-markers t)
  '(org-hide-leading-stars t)
  '(org-todo-keywords
    '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
  '(package-selected-packages
-   '(ox-hugo mu4e-views ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(org-download ox-hugo mu4e-views ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -58,7 +60,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(hl-todo ((t (:inherit hl-todo :italic t)))))
+ )
 
 (setq
  default-directory "~/"
@@ -418,9 +420,12 @@
 
 (setq org-support-shift-select 'always)
 
-(use-package org-bullets
-  :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+;;(use-package org-bullets
+;;  :config
+;;  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(use-package org-download
+  :ensure t)
 
 (require 'org-crypt)
 (org-crypt-use-before-save-magic)
