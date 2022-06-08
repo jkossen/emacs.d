@@ -37,7 +37,7 @@
  '(org-todo-keywords
    '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
  '(package-selected-packages
-   '(org-download ox-hugo mu4e-views ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(org-appear mixed-pitch org-download ox-hugo mu4e-views ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -310,23 +310,9 @@
   (setq dired-sidebar-use-term-integration t)
   (setq dired-sidebar-use-custom-font t))
 
-(use-package deft
-  :bind (("<f6>" . deft-personal)
-	 ("<f7>" . deft-work))
-  )
-
-;;(defun deft-personal ()
-;;(setq deft-directory "~/notes"
-;;      deft-use-filename-as-title t
-;;      deft-extensions '("md"))
-;;  (deft)
-;;  )
-;;(defun deft-work ()
-(setq deft-directory "~/work/notes"
-      deft-use-filename-as-title t
-      deft-extensions '("md"))
-;;  (deft)
-;;  )
+;; Show hidden emphasis markers
+(use-package org-appear
+  :hook (org-mode . org-appear-mode))
 
 ;;
 ;; org-mode
@@ -337,19 +323,6 @@
 ;; some bits from Emacs From Scratch
 ;; see https://github.com/daviwil/emacs-from-scratch/blob/master/init.el
 ;;
-
-;; set different fonts for MacOS and retina screen
-(set-face-attribute 'bold nil :weight 'semibold)
-(if (eql system-type 'darwin)
-    (progn 
-      (set-face-attribute 'default nil :font "SF Mono" :height 180 :weight 'regular)
-      (set-face-attribute 'fixed-pitch nil :font "SF Mono" :height 180 :weight 'regular)
-      (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 180 :weight 'regular))
-  
-  (progn
-    (set-face-attribute 'default nil :font "FiraCode" :height 140 :weight 'regular)
-    (set-face-attribute 'fixed-pitch nil :font "FiraCode" :height 140)
-    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)))
 
 (defun org-mode-setup ()
   ;; Set faces for heading levels
@@ -363,16 +336,16 @@
   ;;                 (org-level-8 . 1.1)))
   ;;   (set-face-attribute (car face) nil :inherit 'fixed-pitch :weight 'regular :height (cdr face)))
   ;;   (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
-  
-  (dolist (face '((org-level-1 . 1.0)
-                  (org-level-2 . 1.0)
-                  (org-level-3 . 1.0)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.0)
-                  (org-level-6 . 1.0)
-                  (org-level-7 . 1.0)
-                  (org-level-8 . 1.0)))
-    (set-face-attribute (car face) nil :inherit 'fixed-pitch :weight 'regular :height (cdr face)))
+
+  ;; (dolist (face '((org-level-1 . 1.0)
+  ;;                 (org-level-2 . 1.0)
+  ;;                 (org-level-3 . 1.0)
+  ;;                 (org-level-4 . 1.0)
+  ;;                 (org-level-5 . 1.0)
+  ;;                 (org-level-6 . 1.0)
+  ;;                 (org-level-7 . 1.0)
+  ;;                 (org-level-8 . 1.0)))
+  ;;   (set-face-attribute (car face) nil :inherit 'fixed-pitch :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   ;; (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
@@ -405,6 +378,19 @@
 ;; /see https://github.com/daviwil/emacs-from-scratch/blob/master/init.el
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; specify fonts
+(set-face-attribute 'bold nil :weight 'semibold)
+(if (eql system-type 'darwin)
+    (progn
+      (set-face-attribute 'default nil :font "SF Mono" :height 180 :weight 'regular)
+      (set-face-attribute 'fixed-pitch nil :font "SF Mono" :height 180 :weight 'regular)
+      (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 180 :weight 'regular))
+  (progn
+    (set-face-attribute 'default nil :font "FiraCode" :height 140 :weight 'regular)
+    (set-face-attribute 'fixed-pitch nil :font "FiraCode" :height 140)
+    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)))
+
+
 ;;(add-hook 'org-mode-hook 'variable-pitch-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
 (add-hook 'org-mode-hook 'org-indent-mode)
@@ -427,6 +413,11 @@
 (use-package org-download
   :ensure t)
 
+(use-package mixed-pitch
+  :hook
+  (text-mode . mixed-pitch-mode))
+
+  
 (require 'org-crypt)
 (org-crypt-use-before-save-magic)
 (setq org-tags-exclude-from-inheritance '("crypt"))
@@ -479,7 +470,7 @@
 	 :time-stamp-file nil
 	 :with-author t
 	 :headline-levels 4
-	 
+
 	 :html-doctype "html5"
 
 	 :html-html5-fancy t
@@ -520,7 +511,7 @@
                       (content "main" "content")
                       (postamble "footer" "postamble"))
       org-html-container-element "section")
-      
+
 (defun pubkos ()
   "republish site, unmodified files included"
   (interactive)
@@ -565,35 +556,8 @@ PROJECT: `posts in this case."
 (setq org-export-global-macros
       '(("timestamp" . "@@html:<span class=\"timestamp\">[$1]</span>@@")))
 
-;; (use-package org-roam)
-
-;; (org-roam-db-autosync-mode)
-
-
-;; (defun roam-sitemap (title list)
-;;   (concat "#+OPTIONS: ^:nil author:nil html-postamble:nil\n"
-;;           "#+SETUPFILE: ./simple_inline.theme\n"
-;;           "#+TITLE: " title "\n\n"
-;;           (org-list-to-org list) "\nfile:sitemap.svg"))
-
-;; (setq my-publish-time 0)   ; see the next section for context
-;; (defun roam-publication-wrapper (plist filename pubdir)
-;;   (org-roam-graph)
-;;   (org-html-publish-to-html plist filename pubdir)
-;;   (setq my-publish-time (cadr (current-time))))
-
-;; (setq org-publish-project-alist
-;;       '(("roam"
-;; 	 :base-directory "~/org"
-;; 	 :auto-sitemap t
-;; 	 :sitemap-function roam-sitemap
-;; 	 :sitemap-title "Roam notes"
-;; 	 :publishing-function roam-publication-wrapper
-;; 	 :publishing-directory "~/roam-export"
-;; 	 :section-number nil
-;; 	 :table-of-contents nil
-;; 	 :style "<link rel=\"stylesheet\" href=\"../other/mystyle.css
-;; \" type=\"text/css\">")))
+(setq org-image-actual-width '(300))
+(setq-default line-spacing 4)
 
 (defun reload-dotemacs ()
   "reload your .emacs file without restarting Emacs"
