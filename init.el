@@ -37,7 +37,7 @@
  '(org-todo-keywords
    '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
  '(package-selected-packages
-   '(org-appear mixed-pitch org-download ox-hugo mu4e-views ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(org-superstar org-appear mixed-pitch org-download ox-hugo mu4e-views ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -53,14 +53,15 @@
  '(tooltip-mode nil)
  '(user-mail-address "jochem@jkossen.nl")
  '(version-control t)
- '(visible-bell t))
+ '(visible-bell t)
+ '(warning-suppress-log-types '((comp))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(hl-todo ((t (:inherit hl-todo :italic t)))))
 
 (setq
  default-directory "~/"
@@ -94,6 +95,7 @@
 (global-set-key "\C-c\ c" 'org-capture)
 (global-set-key "\C-c\ l" 'org-store-link)
 (global-set-key "\C-c\ h" (lambda() (interactive)(find-file "~/org/index.org")))
+(global-set-key "\C-c\ j" (lambda() (interactive)(find-file "~/org/journal.org")))
 (global-set-key "\C-c\ w" (lambda() (interactive)(find-file "~/work/org/index.org.gpg")))
 (global-set-key (kbd "<C-tab>") 'yas-expand)
 
@@ -156,6 +158,8 @@
 (require 'notmuch)
 
 (use-package command-log-mode)
+
+(use-package olivetti)
 
 (use-package modus-themes)
 
@@ -314,6 +318,18 @@
 (use-package org-appear
   :hook (org-mode . org-appear-mode))
 
+;; Setup fonts
+(set-face-attribute 'bold nil :weight 'semi-bold)
+(if (eql system-type 'darwin)
+    (progn
+      (set-face-attribute 'default nil :font "SF Mono" :height 180 :weight 'regular)
+      (set-face-attribute 'fixed-pitch nil :font "SF Mono" :height 180 :weight 'regular)
+      (set-face-attribute 'variable-pitch nil :font "Arial" :height 180 :weight 'regular))
+  (progn
+    (set-face-attribute 'default nil :font "FiraCode" :height 140 :weight 'regular)
+    (set-face-attribute 'fixed-pitch nil :font "FiraCode" :height 140)
+    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)))
+
 ;;
 ;; org-mode
 ;;
@@ -325,40 +341,6 @@
 ;;
 
 (defun org-mode-setup ()
-  ;; Set faces for heading levels
-  ;; (dolist (face '((org-level-1 . 1.2)
-  ;;                 (org-level-2 . 1.1)
-  ;;                 (org-level-3 . 1.05)
-  ;;                 (org-level-4 . 1.0)
-  ;;                 (org-level-5 . 1.1)
-  ;;                 (org-level-6 . 1.1)
-  ;;                 (org-level-7 . 1.1)
-  ;;                 (org-level-8 . 1.1)))
-  ;;   (set-face-attribute (car face) nil :inherit 'fixed-pitch :weight 'regular :height (cdr face)))
-  ;;   (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face)))
-
-  ;; (dolist (face '((org-level-1 . 1.0)
-  ;;                 (org-level-2 . 1.0)
-  ;;                 (org-level-3 . 1.0)
-  ;;                 (org-level-4 . 1.0)
-  ;;                 (org-level-5 . 1.0)
-  ;;                 (org-level-6 . 1.0)
-  ;;                 (org-level-7 . 1.0)
-  ;;                 (org-level-8 . 1.0)))
-  ;;   (set-face-attribute (car face) nil :inherit 'fixed-pitch :weight 'regular :height (cdr face)))
-
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  ;; (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  ;; (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  ;; (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  ;; (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-  ;; (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch)
   (setq org-log-done 'time)
   (setq org-default-notes-file (concat org-directory "/notes.org"))
   (setq org-capture-templates
@@ -378,19 +360,6 @@
 ;; /see https://github.com/daviwil/emacs-from-scratch/blob/master/init.el
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; specify fonts
-(set-face-attribute 'bold nil :weight 'semibold)
-(if (eql system-type 'darwin)
-    (progn
-      (set-face-attribute 'default nil :font "SF Mono" :height 180 :weight 'regular)
-      (set-face-attribute 'fixed-pitch nil :font "SF Mono" :height 180 :weight 'regular)
-      (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 180 :weight 'regular))
-  (progn
-    (set-face-attribute 'default nil :font "FiraCode" :height 140 :weight 'regular)
-    (set-face-attribute 'fixed-pitch nil :font "FiraCode" :height 140)
-    (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)))
-
-
 ;;(add-hook 'org-mode-hook 'variable-pitch-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
 (add-hook 'org-mode-hook 'org-indent-mode)
@@ -406,17 +375,16 @@
 
 (setq org-support-shift-select 'always)
 
-;;(use-package org-bullets
-;;  :config
-;;  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+(use-package org-superstar
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-superstar-mode 1))))
 
 (use-package org-download
   :ensure t)
 
-(use-package mixed-pitch
-  :hook
-  (text-mode . mixed-pitch-mode))
-
+;;(use-package mixed-pitch
+;;  :hook
+;;  (text-mode . mixed-pitch-mode))
   
 (require 'org-crypt)
 (org-crypt-use-before-save-magic)
@@ -435,10 +403,10 @@
 ;;
 ;; # -*- buffer-auto-save-file-name: nil; -*-
 
-(font-lock-add-keywords
- 'org-mode
- '(("^ *\\([-]\\) "
-    (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+;; (font-lock-add-keywords
+;;  'org-mode
+;;  '(("^ *\\([-]\\) "
+;;     (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
 (setq org-roam-directory (file-truename "~/org"))
 
