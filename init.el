@@ -32,6 +32,7 @@
  '(ns-command-modifier 'meta)
  '(org-agenda-files
    '("/Users/jochem/work/org/index.org.gpg" "~/work/org/bwijnolts.org.gpg"))
+ '(org-cycle-separator-lines -1)
  '(org-download-image-dir "./img")
  '(org-hide-emphasis-markers t)
  '(org-hide-leading-stars t)
@@ -324,8 +325,8 @@
 (set-face-attribute 'bold nil :weight 'semi-bold)
 (if (eql system-type 'darwin)
     (progn
-      (set-face-attribute 'default nil :font "SF Mono" :height 180 :weight 'regular)
-      (set-face-attribute 'fixed-pitch nil :font "SF Mono" :height 180 :weight 'regular)
+      (set-face-attribute 'default nil :font "iA Writer Duo S" :height 180 :weight 'regular)
+      (set-face-attribute 'fixed-pitch nil :font "iA Writer Duo S" :height 180 :weight 'regular)
       (set-face-attribute 'variable-pitch nil :font "Arial" :height 180 :weight 'regular))
   (progn
     (set-face-attribute 'default nil :font "FiraCode" :height 140 :weight 'regular)
