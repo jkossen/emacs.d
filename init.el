@@ -329,8 +329,8 @@
       (set-face-attribute 'fixed-pitch nil :font "iA Writer Duo S" :height 180 :weight 'regular)
       (set-face-attribute 'variable-pitch nil :font "Arial" :height 180 :weight 'regular))
   (progn
-    (set-face-attribute 'default nil :font "FiraCode" :height 140 :weight 'regular)
-    (set-face-attribute 'fixed-pitch nil :font "FiraCode" :height 140)
+    (set-face-attribute 'default nil :font "iA Writer Duo S" :height 140 :weight 'regular)
+    (set-face-attribute 'fixed-pitch nil :font "iA Writer Duo S" :height 140)
     (set-face-attribute 'variable-pitch nil :font "Cantarell" :height 140 :weight 'regular)))
 
 ;;
