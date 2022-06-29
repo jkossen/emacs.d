@@ -10,7 +10,7 @@
  '(column-number-mode t)
  '(create-lockfiles nil)
  '(custom-safe-themes
-   '("0998a5646f4a322ba70ca51cf7db727cb75eec2cf1fca0a28442e72142b170ce" "1d5e33500bc9548f800f9e248b57d1b2a9ecde79cb40c0b1398dec51ee820daf" "246a9596178bb806c5f41e5b571546bb6e0f4bd41a9da0df5dfbca7ec6e2250c" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" "75636d4a6c176bf53bef4b0b525fbb9cd84837a2a7d66daf7d15273883070806" "b77a00d5be78f21e46c80ce450e5821bdc4368abf4ffe2b77c5a66de1b648f10" default))
+   '("dad40020beea412623b04507a4c185079bff4dcea20a93d8f8451acb6afc8358" "a0415d8fc6aeec455376f0cbcc1bee5f8c408295d1c2b9a1336db6947b89dd98" "5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" "0998a5646f4a322ba70ca51cf7db727cb75eec2cf1fca0a28442e72142b170ce" "1d5e33500bc9548f800f9e248b57d1b2a9ecde79cb40c0b1398dec51ee820daf" "246a9596178bb806c5f41e5b571546bb6e0f4bd41a9da0df5dfbca7ec6e2250c" "835868dcd17131ba8b9619d14c67c127aa18b90a82438c8613586331129dda63" "75636d4a6c176bf53bef4b0b525fbb9cd84837a2a7d66daf7d15273883070806" "b77a00d5be78f21e46c80ce450e5821bdc4368abf4ffe2b77c5a66de1b648f10" default))
  '(delete-old-versions t)
  '(dired-sidebar-theme 'vscode)
  '(exec-path
@@ -39,7 +39,7 @@
  '(org-todo-keywords
    '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
  '(package-selected-packages
-   '(git-auto-commit-mode org-superstar org-appear mixed-pitch org-download ox-hugo mu4e-views ob-php org-contrib auto-dark twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(git-auto-commit-mode org-superstar org-appear mixed-pitch org-download ox-hugo mu4e-views ob-php org-contrib twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -121,12 +121,6 @@
   (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 
-;; https://emacs.stackexchange.com/questions/68288/error-retrieving-https-elpa-gnu-org-packages-archive-contents
-;; Error retrieving: https://elpa.gnu.org/packages/archive-contents
-(when (and (equal emacs-version "27.2")
-           (eql system-type 'darwin))
-  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
-
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -164,11 +158,6 @@
 (use-package olivetti)
 
 (use-package modus-themes)
-
-(use-package auto-dark
-  :config
-  (setq auto-dark--dark-theme 'modus-vivendi)
-  (setq auto-dark--light-theme 'modus-operandi))
 
 (use-package projectile
   :config
