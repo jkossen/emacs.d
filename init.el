@@ -76,6 +76,8 @@
 
 (setenv "PATH" (concat (getenv "PATH") ":/Users/jochem/go/bin:/usr/local/bin:/opt/bin"))
 
+(load-theme 'doom-palenight t)
+
 (defun duplicate-line()
   (interactive)
   (move-beginning-of-line 1)
