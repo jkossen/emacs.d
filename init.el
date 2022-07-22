@@ -39,7 +39,7 @@
  '(org-todo-keywords
    '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
  '(package-selected-packages
-   '(git-auto-commit-mode org-superstar org-appear mixed-pitch org-download ox-hugo mu4e-views ob-php org-contrib twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
+   '(org-present git-auto-commit-mode org-superstar org-appear mixed-pitch org-download ox-hugo mu4e-views ob-php org-contrib twittering-mode olivetti modus-themes org-roam yasnippet-snippets dired-sidebar doom-one company-mode company vscode-icon hl-todo org-bullets doom-themes vs-dark-theme vs-light-theme zenburn-theme yasnippet lsp-ui lsp-mode eglot web-mode typescript-mode vue-mode go-mode projectile deft magit markdown-mode swiper doom-modeline ivy command-log-mode use-package))
  '(recentf-max-menu-items 25)
  '(recentf-max-saved-items 25)
  '(recentf-mode t)
@@ -75,8 +75,6 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (setenv "PATH" (concat (getenv "PATH") ":/Users/jochem/go/bin:/usr/local/bin:/opt/bin"))
-
-(load-theme 'doom-palenight t)
 
 (defun duplicate-line()
   (interactive)
@@ -160,6 +158,8 @@
 (use-package olivetti)
 
 (use-package modus-themes)
+(use-package doom-themes)
+(load-theme 'doom-palenight t)
 
 (use-package projectile
   :config
@@ -311,6 +311,8 @@
 ;; Show hidden emphasis markers
 (use-package org-appear
   :hook (org-mode . org-appear-mode))
+
+(use-package org-present)
 
 ;; Setup fonts
 (set-face-attribute 'bold nil :weight 'semi-bold)
